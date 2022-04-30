@@ -227,8 +227,8 @@ unsigned floatAbsVal(unsigned uf) {
  *   Rating: 2
  */
 unsigned floatNegate(unsigned uf) {
-  if((uf << 9) == 0 || ((uf >> 23) & 255) == 255) return uf;
-  else return (1 << 31) ^ uf;
+  if((uf << 9) == 0 || ((uf >> 23) & 255) != 255) return (1 << 31) ^ uf;
+  else return uf;
 }
 /* 
  * floatPower2 - Return bit-level equivalent of the expression 2.0^x
@@ -244,7 +244,9 @@ unsigned floatNegate(unsigned uf) {
  *   Rating: 4
  */
 unsigned floatPower2(int x) {
-    return 0;
+  if(x > 127) return 0x7F800000;
+  if(x < -128) return 0;
+  return (x + 127) << 23;
 }
 //#include "floatScale2.c"
 //#include "isLess.c"
@@ -257,7 +259,9 @@ unsigned floatPower2(int x) {
  *   Rating: 4
  */
 int isPower2(int x) {
-   return !((x & (~x + 1)) ^ x);
+  int a = !((1 << 31) + (~x + 1));
+  a = a | (!x);
+  return (!(x & (x + (~1 + 1)))) & !a;
 }
 /* 
  * logicalNeg - implement the ! operator, using all of 
@@ -324,12 +328,9 @@ int rotateRight(int x, int n) {
  *   Rating: 3
  */
 int satMul2(int x) {
-  int a = x << 1;
-  int b = (a^x) >> 31;
-  int c = a >> 31;
-  c = ((1 << 31) ^ c) & b;
-  a = ~b & a;
-  return c | b;
+  int a = ((x << 1) ^ x) >> 31;
+  int b = (((x << 1) >> 31) ^ (1 << 31));
+  return (a & b) | (~a & (x << 1));
 }
 /* 
  * sign - return 1 if positive, 0 if zero, and -1 if negative
