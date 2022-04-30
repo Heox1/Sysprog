@@ -280,7 +280,7 @@ int logicalNeg(int x) {
  */
 int logicalShift(int x, int n) {
   int a = !!((1 << 31) & x);
-  int b = (a << (31 + (-n)));
+  int b = (a << (31 + (~n + 1)));
   return ((x & (~(1 << 31))) >> n) | b;
 }
 /* 
@@ -306,9 +306,9 @@ int replaceByte(int x, int n, int c) {
  *   Rating: 3 
  */
 int rotateRight(int x, int n) {
-  int last = ((1 << n) + (-1)) & x;
+  int last = ((1 << n) + (~1 + 1)) & x;
   x = x >> n;
-  last = last << (32 + (n));
+  last = last << (32 + (~n+1));
   return x | last;
 }
 /*
