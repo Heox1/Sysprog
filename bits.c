@@ -292,11 +292,11 @@ int logicalShift(int x, int n) {
  *   Max ops: 10
  *   Rating: 3
  */
-int replaceByte(int x, int n, int c) {
-  n = (n >> 3);
-  int a = ~(255 << n);
-  return (a & x) | (c << n);
-}
+  int replaceByte(int x, int n, int c) {
+    n = (n << 3);
+    x = ~(255 << n) & x;
+    return x | (c << n);
+  }
 /* 
  * rotateRight - Rotate x to the right by n
  *   Can assume that 0 <= n <= 31
@@ -306,10 +306,13 @@ int replaceByte(int x, int n, int c) {
  *   Rating: 3 
  */
 int rotateRight(int x, int n) {
+  int a = !!((1 << 31) & x);
+  a = ~a + 1;
+  x = a ^ x;
   int last = ((1 << n) + (~1 + 1)) & x;
   x = x >> n;
   last = last << (32 + (~n+1));
-  return x | last;
+  return a ^ (x | last);
 }
 /*
  * satMul2 - multiplies by 2, saturating to Tmin or Tmax if overflow
@@ -363,5 +366,5 @@ int thirdBits(void) {
  */
 int upperBits(int n) {
   int a = (!!n) << 31;
-  return ((a >> (n-1)) & (~0));
+  return ((a >> (n+(~1+1))) & (~0));
 }
